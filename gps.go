@@ -1,10 +1,6 @@
-package main
+package gps
 
 import (
-	"bytes"
-	"fmt"
-	serial "github.com/tarm/goserial"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -54,7 +50,7 @@ func latlngToDecimal(coord string, dir string, lat bool) string {
 }
 
 // $GPGGA,221440.069,3033.2807,N,08126.6636,W,1,05,1.7,-20.0,M,-31.7,M,,0000*72
-func parseNMEA(raw string) Nmea {
+func ParseNMEA(raw string) Nmea {
 
 	line := strings.Split(raw, ",")
 	t := strings.Split(line[0], "")
@@ -86,31 +82,4 @@ func parseNMEA(raw string) Nmea {
 		}
 	}
 	return Nmea{}
-}
-
-func main() {
-	conf := new(serial.Config)
-	conf.Name = "/dev/tty.SLAB_USBtoUART"
-	conf.Baud = 4800
-
-	sc, err := serial.OpenPort(conf)
-	if err != nil {
-		log.Fatal(err)
-	}
-	buffer := bytes.NewBuffer([]byte{})
-	for {
-		buf := make([]byte, 1)
-		_, err := sc.Read(buf)
-		if string(buf[0]) == "$" {
-
-			gga := parseNMEA(buffer.String())
-			fmt.Println(gga)
-			buffer.Reset()
-		} else {
-			buffer.Write(buf)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-	}
 }

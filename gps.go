@@ -5,7 +5,9 @@ import (
 	"fmt"
 	serial "github.com/tarm/goserial"
 	"log"
+	"regexp"
 	"strings"
+	"strconv"
 )
 
 type Nmea struct {
@@ -27,23 +29,29 @@ type Nmea struct {
 }
 
 func latlngToDecimal(coord string, dir string, lat bool) string {
-	// decimal := nil
-	// if (lat && dir.upcase == "S") || dir.upcase == "W" {
-	//   negative := true
-	// }
-	//
-	// if coord =~ /^-?([0-9]*?)([0-9]{2,2}\.[0-9]*)$/ {
-	//   deg = $1.to_i // degrees
-	//    min = $2.to_f // minutes & seconds
-	//
-	//    // Calculate
-	//    decimal = deg + (min / 60)
-	//
-	//    if negative {
-	//      decimal *= -1
-	//    }
-	// }
-	return ""
+  decimal := 0.0
+  negative := false
+  
+  if (lat && strings.ToUpper(dir) == "S") || strings.ToUpper(dir) == "W" {
+    negative = true
+  }
+  
+  r, _ := regexp.Compile("^-?([0-9]*?)([0-9]{2,2}\\.[0-9]*)$")
+  
+  // fmt.Println(r.FindStringSubmatch(coord))
+  result := r.FindStringSubmatch(coord)
+  deg, _ := strconv.ParseFloat(result[1], 32) // degrees
+  min, _ := strconv.ParseFloat(result[2], 32) // minutes & seconds
+  
+   // Calculate
+   decimal = deg + (min / 60)
+
+   if negative {
+     decimal *= -1
+   }
+   
+   _decimal := strconv.FormatFloat(decimal, 'g', 'g' ,32)
+   return _decimal
 }
 
 // $GPGGA,221440.069,3033.2807,N,08126.6636,W,1,05,1.7,-20.0,M,-31.7,M,,0000*72
@@ -73,12 +81,12 @@ func parseNMEA(raw string) Nmea {
 				LastDgps:        line[13],
 				Dgps:            line[14],
 			}
-			fmt.Println("Latitude", gga.Latitude, gga.LatRef)
-			fmt.Println("Longitude", gga.Longitude, gga.LongRef)
+      // fmt.Println("Latitude", gga.Latitude, gga.LatRef)
+      // fmt.Println("Longitude", gga.Longitude, gga.LongRef)
 
 			gga.Latitude = latlngToDecimal(gga.Latitude, gga.LatRef, true)
 			gga.Longitude = latlngToDecimal(gga.Longitude, gga.LongRef, true)
-
+      fmt.Println("lat: ",gga.Latitude, "long: ", gga.Longitude)
 			return gga
 		}
 	}

@@ -6,8 +6,8 @@ import (
 	serial "github.com/tarm/goserial"
 	"log"
 	"regexp"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 type Nmea struct {
@@ -29,28 +29,28 @@ type Nmea struct {
 }
 
 func latlngToDecimal(coord string, dir string, lat bool) string {
-  decimal := 0.0
-  negative := false
-  
-  if (lat && strings.ToUpper(dir) == "S") || strings.ToUpper(dir) == "W" {
-    negative = true
-  }
-  
-  r, _ := regexp.Compile("^-?([0-9]*?)([0-9]{2,2}\\.[0-9]*)$")
+	decimal := 0.0
+	negative := false
 
-  result := r.FindStringSubmatch(coord)
-  deg, _ := strconv.ParseFloat(result[1], 32) // degrees
-  min, _ := strconv.ParseFloat(result[2], 32) // minutes & seconds
-  
-   // Calculate
-   decimal = deg + (min / 60)
+	if (lat && strings.ToUpper(dir) == "S") || strings.ToUpper(dir) == "W" {
+		negative = true
+	}
 
-   if negative {
-     decimal *= -1
-   }
-   
-   _decimal := strconv.FormatFloat(decimal, 'g', 'g' ,32)
-   return _decimal
+	r, _ := regexp.Compile("^-?([0-9]*?)([0-9]{2,2}\\.[0-9]*)$")
+
+	result := r.FindStringSubmatch(coord)
+	deg, _ := strconv.ParseFloat(result[1], 32) // degrees
+	min, _ := strconv.ParseFloat(result[2], 32) // minutes & seconds
+
+	// Calculate
+	decimal = deg + (min / 60)
+
+	if negative {
+		decimal *= -1
+	}
+
+	_decimal := strconv.FormatFloat(decimal, 'g', 'g', 32)
+	return _decimal
 }
 
 // $GPGGA,221440.069,3033.2807,N,08126.6636,W,1,05,1.7,-20.0,M,-31.7,M,,0000*72

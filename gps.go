@@ -37,8 +37,7 @@ func latlngToDecimal(coord string, dir string, lat bool) string {
   }
   
   r, _ := regexp.Compile("^-?([0-9]*?)([0-9]{2,2}\\.[0-9]*)$")
-  
-  // fmt.Println(r.FindStringSubmatch(coord))
+
   result := r.FindStringSubmatch(coord)
   deg, _ := strconv.ParseFloat(result[1], 32) // degrees
   min, _ := strconv.ParseFloat(result[2], 32) // minutes & seconds
@@ -81,12 +80,8 @@ func parseNMEA(raw string) Nmea {
 				LastDgps:        line[13],
 				Dgps:            line[14],
 			}
-      // fmt.Println("Latitude", gga.Latitude, gga.LatRef)
-      // fmt.Println("Longitude", gga.Longitude, gga.LongRef)
-
 			gga.Latitude = latlngToDecimal(gga.Latitude, gga.LatRef, true)
 			gga.Longitude = latlngToDecimal(gga.Longitude, gga.LongRef, true)
-      fmt.Println("lat: ",gga.Latitude, "long: ", gga.Longitude)
 			return gga
 		}
 	}
@@ -107,8 +102,9 @@ func main() {
 		buf := make([]byte, 1)
 		_, err := sc.Read(buf)
 		if string(buf[0]) == "$" {
-			// fmt.Println(buffer.String())
-			parseNMEA(buffer.String())
+
+			gga := parseNMEA(buffer.String())
+			fmt.Println(gga)
 			buffer.Reset()
 		} else {
 			buffer.Write(buf)

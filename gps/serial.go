@@ -8,7 +8,7 @@ import (
 
 func ParseNmea(device string,baud int) (nmea Nmea, err error) {
   gga := nmea
-  
+
   conf := &serial.Config{
     Name: device,
     Baud: baud,
@@ -17,7 +17,7 @@ func ParseNmea(device string,baud int) (nmea Nmea, err error) {
   if err != nil {
     log.Fatal(err)
   }
- 
+
   buffer := bytes.NewBuffer([]byte{})
 	for {
 		buf := make([]byte, 1)

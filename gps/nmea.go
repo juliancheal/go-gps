@@ -55,7 +55,7 @@ func parser(raw string) (nmea Nmea, err error) {
   err = nil
   line := strings.Split(raw, ",")
   t := strings.Split(line[0], "")
- 
+
   if 0 < len(t) {
     temp := t[2:5]
     switch strings.Join(temp, "") {
